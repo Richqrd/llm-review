@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "LLM Review",
+  "version": "1.0",
+  "description": "A Chrome Covidence extension to assist TiAb screening with AI.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "images/teddybear-dog-breeds.png"
+    }
+  },
+  "icons": {
+    "128": "images/teddybear-dog-breeds.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.covidence.org/reviews/*/review_studies/screen*"
+      ],
+      "js": ["content.js"],
+      "css": ["css/pico.min.css"]
+    }
+  ]
+}
