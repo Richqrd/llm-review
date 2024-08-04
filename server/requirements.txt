@@ -3,3 +3,5 @@ Flask_Cors==4.0.1
 openai==1.37.1
 python-dotenv==1.0.1
 transformers==4.43.3
+gunicorn==22.0.0
+torch==2.4.0

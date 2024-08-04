@@ -1,5 +1,7 @@
 console.log("LLM Review Running")
 
+// const API = 'http://127.0.0.1:8080'
+const API = 'https://llm-image-uusnu6kzea-uc.a.run.app'
 const score_threshold = 0.000
 const MAX_QUESTIONS = 7
 
@@ -355,7 +357,7 @@ function qaPost(message, submitButton, saveState, final=false) {
     submitButton.textContent = 'Loading...';
     submitButton.disabled = true;
 
-    fetch('http://127.0.0.1:5000/api/submit', {
+    fetch(API + '/api/submit', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

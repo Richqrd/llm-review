@@ -5,17 +5,26 @@ from scripts.transformer import *
 
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+import os
 
 app = Flask(__name__)
 CORS(app) # This will enable CORS for all routes
 
-model_choice = 'ChatGPT'
+model_choice = os.environ.get('MODEL', 'ChatGPTmini')
 models = {
     'Roberta': roberta,
+    'Deberta': deberta,
     'ChatGPT': chatgpt,
+    'ChatGPTmini': chatgptmini,
     'Dummy': dummy,
+    'HFElectra': hf_electra
 }
 transformer = models[model_choice]
+
+@app.route('/')
+def home():
+    data = {'message': 'Hello world.'}
+    return jsonify(data)
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
@@ -66,7 +75,7 @@ async def run_transformer(executor, question, id, text):
 async def process_questions_and_texts(questions, ids, extracted_texts):
     para_answers = []
     if questions and extracted_texts:
-        print("Running model" + "*"*10)
+        print("Running model" + "*"*10 + model_choice)
         executor = ThreadPoolExecutor(max_workers=10)  # Adjust the number of workers based on your needs
         tasks = []
 
@@ -96,7 +105,7 @@ def get_question_answers(questions, ids, extracted_texts):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8080) # for Docker, otherwise only param is debug=True
 
     
 

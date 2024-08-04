@@ -2,6 +2,7 @@
 .DS_Store
 .pyc
 
-server/app2.py
-
 extension/legacy/
+server/legacy/
+
+Dockerfile
