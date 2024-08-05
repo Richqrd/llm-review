@@ -7,8 +7,11 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import os
 
+import sys
+
 app = Flask(__name__)
 CORS(app) # This will enable CORS for all routes
+sys.setrecursionlimit(100) # set recursion limit to prevent infinite scaling lol
 
 model_choice = os.environ.get('MODEL', 'ChatGPTmini')
 models = {
@@ -105,6 +108,9 @@ def get_question_answers(questions, ids, extracted_texts):
 
 
 if __name__ == '__main__':
+
+    print(sys.getrecursionlimit())
+    print(model_choice)
     app.run(debug=True, port=8080) # for Docker, otherwise only param is debug=True
 
     

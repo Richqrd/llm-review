@@ -63,20 +63,46 @@ def chatgpt(question, id, abstract):
 
     # Create request
     client = openai.OpenAI()
-    response = client.chat.completions.create(
-        model="gpt-4o", # 0.15 per 1M tokens
-        # model="gpt-4o", # 5.00 per 1M tokens
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt},
-        ],
-        max_tokens=100
-    )
-    choice = response.choices[0].message.content
-    usage = response.usage.total_tokens
-    print(usage)
-    # print(choice)
-    return {'answer': choice, 'id': id}
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o", # 0.15 per 1M tokens
+            # model="gpt-4o", # 5.00 per 1M tokens
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=100
+        )
+
+        choice = response.choices[0].message.content
+        usage = response.usage.total_tokens
+        print(usage)
+        # print(choice)
+        return {'answer': choice, 'id': id}
+
+    
+    except openai.APIConnectionError as e:
+        #Handle connection error here
+        print(f"Failed to connect to OpenAI API: {e}, retrying in 30s")
+        time.sleep(30)
+        return chatgpt(question, id, abstract)
+    except openai.RateLimitError as e:
+        #Handle rate limit error (we recommend using exponential backoff)
+        print(f"OpenAI API request exceeded rate limit: {e}, retrying in 30s")
+        time.sleep(30)
+        return chatgpt(question, id, abstract)
+    except openai.APIError as e:
+        #Handle API error here, e.g. retry or log
+        print(f"OpenAI API returned an API Error: {e}")
+        return None
+    except Exception as e:
+        # Handle any other exceptions
+        print(f"An unexpected error occurred: {e}")
+        return None
+
+
+
 
 def chatgptmini(question, id, abstract):
     # Load environment variables from the .env file
@@ -101,20 +127,42 @@ def chatgptmini(question, id, abstract):
 
     # Create request
     client = openai.OpenAI()
-    response = client.chat.completions.create(
-        model="gpt-4o-mini", # 0.15 per 1M tokens
-        # model="gpt-4o", # 5.00 per 1M tokens
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt},
-        ],
-        max_tokens=100
-    )
-    choice = response.choices[0].message.content
-    usage = response.usage.total_tokens
-    print(usage)
-    # print(choice)
-    return {'answer': choice, 'id': id}
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini", # 0.15 per 1M tokens
+            # model="gpt-4o", # 5.00 per 1M tokens
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=100
+        )
+
+        choice = response.choices[0].message.content
+        usage = response.usage.total_tokens
+        print(usage)
+        # print(choice)
+        return {'answer': choice, 'id': id}
+
+    except openai.APIConnectionError as e:
+        #Handle connection error here
+        print(f"Failed to connect to OpenAI API: {e}, retrying in 30s")
+        time.sleep(30)
+        return chatgpt(question, id, abstract)
+    except openai.RateLimitError as e:
+        #Handle rate limit error (we recommend using exponential backoff)
+        print(f"OpenAI API request exceeded rate limit: {e}, retrying in 30s")
+        time.sleep(30)
+        return chatgpt(question, id, abstract)
+    except openai.APIError as e:
+        #Handle API error here, e.g. retry or log
+        print(f"OpenAI API returned an API Error: {e}")
+        return None
+    except Exception as e:
+        # Handle any other exceptions
+        print(f"An unexpected error occurred: {e}")
+        return None
 
 def hf_electra(question, id, abstract):
     # Load environment variables from the .env file
@@ -148,6 +196,12 @@ def hf_electra(question, id, abstract):
         print(req.json())
         time.sleep(30)
         return hf_electra(question, id, abstract)
+    elif req.status_code == 500:
+        print("HF server booting, resending in 30s")
+        print(req.json())
+        time.sleep(30)
+        return hf_electra(question, id, abstract)
     else:
         print(req.json())
         raise ValueError("Request failed with status code:", req.status_code)
+        return None
